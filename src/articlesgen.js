@@ -134,7 +134,7 @@ exports.generate = function(options) {
 
 
     if(!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir);    
+        mkdirp(tempDir);    
     }
     
 
