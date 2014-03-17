@@ -8,52 +8,33 @@ var utils = require('./utils');
  * @return {[type]}     [description]
  */
 exports.parse = function (str, tree) {
-    var docTags = str.match(/\/\*\*[\s\S]*?\*\//g);
-
-    var doc = [];
-
+    var docTags = str.match(/\/\*\*[\s\S]*?\*\//g),
+        doc = [];
     for(var i = 0; i<docTags.length; i++) {
-        doc.push(tagBreaker(sanitizeDocTag(docTags[i])));
-        // console.log(tagBreaker(sanitizeDocTag(docTags[i])));    
+        doc.push(tagBreaker(sanitizeDocTag(docTags[i])));  
     }
 
-    // console.log('----------------------------');
-    // console.log(docTags);
-    // console.log('----------------------------');
-
-    var classes = findNodesWhere(doc, {type: 'class'});
-    var methods = findNodesWhere(doc, {type: 'method'});
+    var classes = findNodesWhere(doc, {type: 'class'}),
+        methods = findNodesWhere(doc, {type: 'method'});
 
     for(var i=0; i<classes.length; i++) {
         var classObj = {};
         wrappify(classes[i], classObj);
-
         addExtraParams(classObj);
-
         if(classObj.access && classObj.access.name === 'private') continue;
-
         tree.classes.push(classObj);
     }
 
     for(var i=0; i<methods.length; i++) {
         var methodObj = {};
-
         wrappify(methods[i], methodObj);
-        
         addExtraParams(methodObj);
-
         if(!methodObj.memberOf) continue;
-
-
         var classNode = utils.findNodeByClassName(tree, methodObj.memberOf.name);
-
         if(!classNode) continue;
-
-
         if(typeof classNode.methods === 'undefined') {
             classNode.methods = [];
         }
-
         classNode.methods.push(methodObj);
     }
 
@@ -89,12 +70,10 @@ function paramList(param) {
         }
         return str;
     }
-        
     return '';
 }
 
 function addExtraParams (node) {
-    
     if(node.class) {
         node.signature = 'new ' + node.class.name + '(' + paramList(node.param) + ')';
     } else if(node.method) {
@@ -151,22 +130,14 @@ function tagBreaker (str) {
     }
 
     tags.push('@' + str);
-    
     for(var i=0; i<tags.length; i++) {
         tagProcessor(tree, tags[i]);
     }
-
-    // console.log(str.indexOf('@'));
-    // var matches = str.match(/\s*\*\s*@([a-zA-Z0-9_$]*)([\s\w\W\n]*)(?:@)/g);
-
-    // console.log(matches);
-    
     return tree;
 }
 
 var tagGrammer = {
     '@class\\s*([a-zA-Z0-9_$]*)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);
         tree.push({
             type: 'class',
             name: savedArray[0]
@@ -174,14 +145,12 @@ var tagGrammer = {
     },
 
     '@augments\\s*\\{*([a-zA-Z0-9_$]*)\\}*': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);
         tree.push({
             type: 'augments',
             name: savedArray[0]
         });
     },
     '@param\\s*\\{([a-zA-Z0-9_$|]*)\\}\\s+(\\[*[a-zA-Z0-9_$]*\\]*)([\\s\\S]*)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);
         var optional = savedArray[1].match(/\[[a-zA-Z0-9_$]*\]/) !== null;
         if(optional) savedArray[1] = savedArray[1].replace(/\[/g, '').replace(/\]/g, '');
         tree.push({
@@ -193,35 +162,30 @@ var tagGrammer = {
         });
     },
     '@example\\s*([\\s\\S]*)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);   
         tree.push({
             type: 'example',
             code: savedArray[0].trim(),
         });
     },
     '@method\\s*([a-zA-Z0-9_$]*)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);   
         tree.push({
             type: 'method',
             name: savedArray[0].trim(),
         });  
     },
     '@access\\s*(private|public|protected)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);
         tree.push({
             type: 'access',
             name: savedArray[0],
         });  
     },
     '@memberOf\\s*([a-zA-Z0-9_$]*)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);
         tree.push({
             type: 'memberOf',
             name: savedArray[0],
         });  
     },
     '@returns\\s*\\{([a-zA-Z0-9_$|]*)\\}\\s+([\\s\\S]*)': function(tree, matchedString, savedArray) {
-        // console.log(matchedString, savedArray);
         tree.push({
             type: 'returns',
             returnType: savedArray[0],
@@ -232,16 +196,12 @@ var tagGrammer = {
 
 function tagProcessor (tree, tag) {
     for(var grammer in tagGrammer) {
-        var regex = new RegExp(grammer);
+        var regex = new RegExp(grammer),
+            match = regex.exec(tag);
 
-        match = regex.exec(tag);
-        // console.log(tag);
         if(match) {
             var func = tagGrammer[grammer];
-
             func(tree, match[0], match.slice(1, match.length));
-
-            // console.log(tree);
         }
             
     }

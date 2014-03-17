@@ -52,11 +52,6 @@ exports.generate = function(tree, _templateDir, _outputDir, outputExt) {
 
         fs.writeFileSync(outputPath, layoutHTML, 'utf-8');
     }
-
-    
-
-    // console.log(renderList);
-    // console.log(tree.classes[0].methods);
 };
 
 

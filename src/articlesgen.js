@@ -132,20 +132,14 @@ exports.generate = function(options) {
     exampleImagesLinkPath = options.exampleImagesLinkPath;
     exampleLiveLinkPath = options.exampleLiveLinkPath;
 
-
     if(!fs.existsSync(tempDir)) {
         mkdirp(tempDir);    
     }
     
-
     preprocessMD(articleTree, articlesDir, outputDir, tempDir);
-
     processMD(articleTree, tempDir);
-
     renderMD(articleTree, tempDir, articleTemplatesDir);
-
     rmdir(tempDir);
-    // console.log(articleTree);
 };
 
 var rmdir = function(dir) {
@@ -306,9 +300,6 @@ function processMD (articleTree, tempDir) {
 
 function preprocessMD (articleTree, articlesDir, outputDir, tempDir) {
     var articles = articleTree.articles;
-
-    
-
     for(var i=0; i<articles.length; i++) {
         var article = articles[i],
             str = fs.readFileSync(articlesDir + '/' + article.path, 'utf-8'),
