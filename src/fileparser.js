@@ -13,31 +13,36 @@ exports.parse = function (str, tree) {
     for(var i = 0; i<docTags.length; i++) {
         doc.push(tagBreaker(sanitizeDocTag(docTags[i])));  
     }
-
+    
     var classes = findNodesWhere(doc, {type: 'class'}),
         methods = findNodesWhere(doc, {type: 'method'});
 
+    var currentClass = null;
     for(var i=0; i<classes.length; i++) {
         var classObj = {};
         wrappify(classes[i], classObj);
         addExtraParams(classObj);
-        if(classObj.access && classObj.access.name === 'private') continue;
+        if(!classObj.access) classObj.access = {name: 'public'};
+        currentClass = classObj;
         tree.classes.push(classObj);
     }
-
+    
     for(var i=0; i<methods.length; i++) {
         var methodObj = {};
         wrappify(methods[i], methodObj);
         addExtraParams(methodObj);
-        if(!methodObj.memberOf) continue;
-        var classNode = utils.findNodeByClassName(tree, methodObj.memberOf.name);
+        var classNode = null;
+        if(!methodObj.memberOf) {
+            classNode = currentClass;            
+        } else {
+            classNode = utils.findNodeByClassName(tree, methodObj.memberOf.name);
+        }
         if(!classNode) continue;
         if(typeof classNode.methods === 'undefined') {
             classNode.methods = [];
         }
         classNode.methods.push(methodObj);
     }
-
     return doc;
 }
  

@@ -21,7 +21,7 @@ var viewObjectHelpers = {
     }
 }
 
-exports.generate = function(tree, _templateDir, _outputDir, outputExt) {
+exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods) {
     var layoutTemplate = '',
         layoutTemplatePath = _templateDir + '/' + 'layout.ejs';
 
@@ -37,7 +37,7 @@ exports.generate = function(tree, _templateDir, _outputDir, outputExt) {
 
     layoutTemplate = fs.readFileSync(layoutTemplatePath, 'utf-8');
 
-    var renderList = tree.findAllClassNames();
+    var renderList = tree.findAllClassNames({'access': 'public'});
 
     renderList = ['index'].concat(renderList);
 

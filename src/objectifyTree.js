@@ -1,11 +1,22 @@
 var _ = require('underscore');
 
 var treeObject = {
-    findAllClassNames: function() {
+    findAllClassNames: function(filterObj) {
         var nodes = [];
         for(var i=0; i<this.classes.length; i++) {
-            var cls = this.classes[i];    
-            nodes.push(cls.class.name);
+            var cls = this.classes[i];
+            var filter = true;
+            if(filterObj) {
+                var keys = _.keys(filterObj);
+                for(var j=0; j<keys.length; j++) {
+                    var key = keys[j];
+                    // This .name is a jugaad!!
+                    if(cls[key] && cls[key].name !== filterObj[key]) {
+                        filter = false;
+                    }
+                }
+            }
+            if(filter) nodes.push(cls.class.name);
         }
 
         return nodes;
