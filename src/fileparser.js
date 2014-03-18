@@ -10,6 +10,9 @@ var utils = require('./utils');
 exports.parse = function (str, tree) {
     var docTags = str.match(/\/\*\*[\s\S]*?\*\//g),
         doc = [];
+    if(docTags === null) {
+        return;
+    }
     for(var i = 0; i<docTags.length; i++) {
         doc.push(tagBreaker(sanitizeDocTag(docTags[i])));  
     }
