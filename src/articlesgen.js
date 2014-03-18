@@ -24,6 +24,13 @@ var articleTree,
     exampleLiveLinkPath,
     exampleImagesLinkPath;
 
+var winston = require('winston')
+var logger = new winston.Logger();
+logger.add(winston.transports.Console, {
+    colorize: true,
+    level: 'info'
+});
+
 var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor'];
 
 var preProcessHelpers = {
@@ -310,7 +317,9 @@ function preprocessMD (articleTree, articlesDir, outputDir, tempDir) {
             dirname = path.dirname(article.path),
             crdr = tempDir + '/' + dirname,
             crPath = path.resolve(tempDir + '/' + article.path);
-
+        if(typeof article.id !== 'string') {
+            logger.warn('article `' + article.path + '` doesn\'t have an id. Please make sure id is present to be able to link from other articles');
+        }
         if(_anchors.anchors.length) {
             for(var j=0; j<_anchors.anchors.length; j++) {
                 anchors.push({
@@ -345,6 +354,10 @@ function addNavButtons (article) {
         
         article.prev = prev;
         article.next = next;
+    } else {
+        if(article.name !== 'index.md') {
+            logger.warn('Article `' + article.path + '` doesn\'t have an index or is not a number');    
+        }
     }
 }
 
