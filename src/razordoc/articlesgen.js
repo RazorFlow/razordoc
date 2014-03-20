@@ -55,7 +55,7 @@ var markdownHelpers = {
             return '';
         }
     },
-    embedExample: function(filename) {
+    embedExample: function(lang, filename) {
         var content = '<pre><code><%- code %></code></pre>';
         var examplesLayoutFile = articleTemplatesDir + '/' + 'exampleLayout.ejs';
         var _examplesImagesDir = !!examplesImagesDir ? examplesImagesDir : '/';
@@ -79,7 +79,7 @@ var markdownHelpers = {
             return '';   
         }
     },
-    linkApi: function(classname, methodname, displayClass) {
+    linkApi: function(lang, classname, methodname, displayClass) {
         var filename = classname + '.' + outputFileExt + '#' + methodname;
         var apiRoot = '/' + path.basename(outputDir) + apiOutput.replace(outputDir, '') + '/' + filename;
         if(fs.existsSync(apiOutput + '/' + filename)) {
