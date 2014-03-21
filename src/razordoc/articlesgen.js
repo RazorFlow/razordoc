@@ -8,6 +8,7 @@ var util = require('util');
 
 var articleTree,
     apiTree,
+    apiConfig,
     exampleTree,
     articlesDir,
     examplesDir,
@@ -59,20 +60,22 @@ var markdownHelpers = {
         var content = '<pre><code><%- code %></code></pre>';
         var examplesLayoutFile = articleTemplatesDir + '/' + 'exampleLayout.ejs';
         var _examplesImagesDir = !!examplesImagesDir ? examplesImagesDir : '/';
+        var exampleNode = exampleTree[lang];
+
         if(fs.existsSync(examplesLayoutFile)) {
             content = fs.readFileSync(examplesLayoutFile, 'utf-8');
         }
+        
+        if(_.indexOf(exampleNode.content, filename) >= 0) {
+            var examplePath = path.resolve(exampleNode.src + '/' + filename + examplesExt);
 
-        if(_.indexOf(exampleTree, filename) >= 0) {
-            var examplePath = path.resolve(examplesDir + '/' + filename + '.' + examplesExt);
-            var webrf_examplesPath = "/static/transfer/exampleImages"
             var code = fs.readFileSync(examplePath, 'utf-8');
 
             return ejs.render(content, {
                 code: code,
-                thumbnail: '<img src="' + exampleImagesLinkPath + '/thumbs/' + filename  + '.png" />',
-                image: exampleImagesLinkPath + '/' + filename + '.png',
-                live: exampleLiveLinkPath + '/' + filename
+                thumbnail: '<img src="' + exampleNode.thumbPrefix + filename + exampleNode.thumbSuffix + '" />',
+                image: exampleNode.imagePrefix + filename + exampleNode.imageSuffix,
+                live: exampleNode.livePrefix + filename + exampleNode.liveSuffix
             });
         } else {
             throw "Example [" + filename + "] not found!";
@@ -80,9 +83,10 @@ var markdownHelpers = {
         }
     },
     linkApi: function(lang, classname, methodname, displayClass) {
+        var apiNode = apiConfig[lang];
         var filename = classname + '.' + outputFileExt + '#' + methodname;
-        var apiRoot = '/' + path.basename(outputDir) + apiOutput.replace(outputDir, '') + '/' + filename;
-        if(fs.existsSync(apiOutput + '/' + filename)) {
+        var apiRoot =   outputLinkPath + '/' + path.basename(articlesOutput) + '/' + apiNode.linkPath + filename;
+        if(fs.existsSync(apiNode.src + '/' + filename)) {
             return '<a href="' + apiRoot + '" style="background: #F66;">' + (displayClass) ? classname + '::' +methodname : methodname + '</a>';
         } else {
             return '<a href="' + apiRoot + '">' + (methodname || classname) + '</a>';    
@@ -138,6 +142,7 @@ exports.generate = function(options) {
     examplesLinkPath = options.examplesLinkPath;
     exampleImagesLinkPath = options.exampleImagesLinkPath;
     exampleLiveLinkPath = options.exampleLiveLinkPath;
+    apiConfig = options.apiConfig;
 
     if(!fs.existsSync(tempDir)) {
         mkdirp(tempDir);    
@@ -227,7 +232,6 @@ function makeLI (str) {
 
 function articleTreeGen() {
     var tree = articleTree.articleStruct;
-    
     return walkTree(tree, makeUL, makeLI);
 }
 
