@@ -8,16 +8,16 @@ var _ = require('underscore');
 
 module.exports = function(grunt) {
 
-    process.on('error', function(err) {
-        console.log('err' + err);
-    });
-
+    // process.on('error', function(err) {
+    //     console.log('err' + err);
+    // });
   grunt.registerMultiTask('razordoc', 'RazorDoc', function() {
     grunt.log.writeln("Starting RazorDoc...");
     var options = this.options({
 
     });
-    
+
+
     // var options = {
     //     articles: {
     //         root: 'src/content'
@@ -69,6 +69,8 @@ module.exports = function(grunt) {
     //     template: "src/templates/default/article_layout",
     //     apiTemplates: "src/templates/default"
     // };
+    // 
+    try {
 
     var configDir = process.cwd();
     // var configDir = path.resolve('.', '../docsrf');
@@ -204,7 +206,11 @@ module.exports = function(grunt) {
         exampleLiveLinkPath: exampleLiveLinkPath
     });
 
-    // grunt.log.ok("RazorDoc Finished");
+    } catch (e) {
+        grunt.fail.warn(e);
+    }
+
+    grunt.log.ok("RazorDoc Finished");
 
     function folderWalker(dirArray, dirPath, articles, rootPath) {
         var dirList = [];
