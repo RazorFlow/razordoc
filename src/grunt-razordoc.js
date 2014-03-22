@@ -171,7 +171,6 @@ module.exports = function(grunt) {
         var examples = _.map(fs.readdirSync(examplesDir), function(item) {
             return item.replace(examplesExt, '');
         });
-
         exampleTree[key] = {
             src: path.resolve(configDir, options.examples[key].src),
             srcSuffix: options.examples[key].srcSuffix,

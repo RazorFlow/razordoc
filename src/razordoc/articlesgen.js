@@ -67,7 +67,7 @@ var markdownHelpers = {
         }
         
         if(_.indexOf(exampleNode.content, filename) >= 0) {
-            var examplePath = path.resolve(exampleNode.src + '/' + filename + examplesExt);
+            var examplePath = path.resolve(exampleNode.src + '/' + filename + exampleNode.srcSuffix);
 
             var code = fs.readFileSync(examplePath, 'utf-8');
 
