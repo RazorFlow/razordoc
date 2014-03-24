@@ -21,14 +21,16 @@ var viewObjectHelpers = {
     }
 }
 
-exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods) {
+exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods, apiNav, articleNav) {
     var layoutTemplate = '',
         layoutTemplatePath = _templateDir + '/' + 'layout.ejs';
 
     templateDir = _templateDir; 
 
     var viewOptions = _.extend({
-        tree: tree
+        tree: tree,
+        apiNav: apiNav,
+        articleNav: articleNav
     }, viewObjectHelpers);
 
     if(!fs.existsSync(layoutTemplatePath)) {

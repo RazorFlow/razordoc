@@ -23,7 +23,8 @@ var articleTree,
     examplesImagesDir,
     examplesLinkPath,
     exampleLiveLinkPath,
-    exampleImagesLinkPath;
+    exampleImagesLinkPath,
+    apiNav;
 
 var winston = require('winston')
 var logger = new winston.Logger();
@@ -143,6 +144,7 @@ exports.generate = function(options) {
     exampleImagesLinkPath = options.exampleImagesLinkPath;
     exampleLiveLinkPath = options.exampleLiveLinkPath;
     apiConfig = options.apiConfig;
+    apiNav = options.apiNav || '';
 
     if(!fs.existsSync(tempDir)) {
         mkdirp(tempDir);    
@@ -150,9 +152,14 @@ exports.generate = function(options) {
     
     preprocessMD(articleTree, articlesDir, outputDir, tempDir);
     processMD(articleTree, tempDir);
+    // renderMD(articleTree, tempDir, articleTemplatesDir);
+    return articleTreeGen();
+};
+
+exports.render = function() {
     renderMD(articleTree, tempDir, articleTemplatesDir);
     rmdir(tempDir);
-};
+}
 
 var rmdir = function(dir) {
     var list = fs.readdirSync(dir);
@@ -286,7 +293,7 @@ function renderMD (articleTree, tempDir) {
         var prev = article.prev ? {title: article.prev.title, path: path2Link(article.prev.path)} : null;
 
         var articleNav = articleTreeGen();
-        var file = ejs.render(layout, {articleNav: articleNav, content: processed, breadcrumb: breadcrumb, title: article.title, 
+        var file = ejs.render(layout, {articleNav: articleNav, apiNav: apiNav, content: processed, breadcrumb: breadcrumb, title: article.title, 
                     next: next, prev: prev});
         // console.log(articleTreeGen());
         // 

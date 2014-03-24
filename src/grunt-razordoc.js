@@ -82,15 +82,26 @@ module.exports = function(grunt) {
     var articles = [];
     var articleStruct = null;
     var apiConfig = {};
+    var apiObjectTree = {};
 
     // api configs
+    var apiTree = {
+        title: 'Razorflow API Documentation',
+        link: '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
+        content: []
+    };
 
-    for(var key in options.api) {
+    for(var key in options.api.lang) {
+        var _apiTree = {
+            title: 'Razorflow ' + key.toUpperCase() + ' Documentation',
+            link: '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
+            content: []
+        };
         apiConfig[key] = {
-            src: path.resolve(configDir, options.api[key].src[0]),
-            linkPath: options.api[key].relativeLinkPath
+            src: path.resolve(configDir, options.api.lang[key].src[0]),
+            linkPath: options.api.lang[key].relativeLinkPath
         }
-        var filenames = options.api[key].src;
+        var filenames = options.api.lang[key].src;
         var files = [];
         for(var i=0; i<filenames.length; i++) {
             var filename = filenames[i],
@@ -116,7 +127,7 @@ module.exports = function(grunt) {
         var tree = {classes:[], namespace: key};
 
         templateDir = path.resolve(configDir, options.apiTemplates);
-        apiOutput = path.resolve(configDir, options.api[key].out);
+        apiOutput = path.resolve(configDir, options.api.lang[key].out);
 
         
         for(var i=0; i<files.length; i++) {
@@ -133,18 +144,54 @@ module.exports = function(grunt) {
         }
         
         tree = objectifyTree(tree);
+        var classes = tree.findAllClassNames();
+        for(var i=0; i<classes.length; i++) {
+            var _class = classes[i];
+            var node = tree.findNodeByClassName(_class);
+            var classTree = {
+                title: _class,
+                link: '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath + _class + '.' + outputExt
+            };
+            _apiTree.content.push(classTree);
+        }
+        apiTree.content.push(_apiTree);
         console.info("START Generating API Documentation")
         var showInheritedMethods =  true;
-        docgen.generate(tree, templateDir, apiOutput, outputExt, showInheritedMethods);    
+        apiObjectTree[key] = {
+            tree: tree,
+            templateDir: templateDir,
+            apiOutput: apiOutput,
+            outputExt: outputExt,
+            showInheritedMethods: true
+        }
+        // apiObjectTree[key] = tree;
+        // apiObjectTree[key]
+        // docgen.generate(tree, templateDir, apiOutput, outputExt, showInheritedMethods);
         console.info("END Generating API Documentation. SUCCESS")
-        
+            
     }
 
+
+    console.log(apiTree.content[0].content[0].content);
+
+
+    function navGen(tree) {
+        var contents = '';
+        if(tree.content) {
+            for(var i=0; i<tree.content.length; i++) {
+                var _tree = tree.content[i];
+                contents += '<ul>' + navGen(_tree) + '</ul>';
+            }
+        }
+            
+        return '<li>' + '<a href="' + tree.link + '">' + tree.title + '</a>' + contents + '</li>';
+    }
+
+    var apiNav = navGen(apiTree);
 
 
     // Article configs
     var articleStruct = folderWalker(fs.readdirSync(articlesDir), articlesDir, articles, articlesDir);
-
     var articleTree = {
         articles: articles,
         articleStruct: articleStruct,
@@ -161,7 +208,6 @@ module.exports = function(grunt) {
     var examplesLinkPath = '';
     var exampleImagesLinkPath = '';
     var exampleLiveLinkPath = '';
-
 
     // Construct the example tree
 
@@ -184,7 +230,7 @@ module.exports = function(grunt) {
         }
     }
 
-    articlesGenerator.generate({
+    var articleNav = articlesGenerator.generate({
         namespaces: ['js', 'php'],
         articleTree: articleTree, 
         apiConfig: apiConfig,
@@ -202,9 +248,16 @@ module.exports = function(grunt) {
         examplesImagesDir: examplesImagesDir,
         examplesLinkPath: examplesLinkPath,
         exampleImagesLinkPath: exampleImagesLinkPath,
-        exampleLiveLinkPath: exampleLiveLinkPath
+        exampleLiveLinkPath: exampleLiveLinkPath,
+        apiNav: apiNav
     });
 
+    articlesGenerator.render();
+    for(var key in options.api.lang) {
+        var conf = apiObjectTree[key];
+        docgen.generate(conf.tree, conf.templateDir, conf.apiOutput, conf.outputExt, conf.showInheritedMethods, apiNav, articleNav);
+    }
+    
     } catch (e) {
         grunt.fail.warn(e);
     }
