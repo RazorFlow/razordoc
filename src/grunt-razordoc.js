@@ -145,7 +145,7 @@ module.exports = function(grunt) {
         }
         
         tree = objectifyTree(tree);
-        var classes = tree.findAllClassNames();
+        var classes = tree.findAllClassNames({access: 'public'});
         for(var i=0; i<classes.length; i++) {
             var _class = classes[i];
             var node = tree.findNodeByClassName(_class);
@@ -185,7 +185,7 @@ module.exports = function(grunt) {
             }
         }
             
-        return '<li>' + '<a href="' + tree.link + '">' + tree.title + '</a>' + contents + '</li>';
+        return '<li>' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
     }
 
     var apiNav = navGen(apiTree);
