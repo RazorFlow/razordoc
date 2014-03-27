@@ -24,6 +24,7 @@ var articleTree,
     examplesLinkPath,
     exampleLiveLinkPath,
     exampleImagesLinkPath,
+    imagesPath,
     apiNav;
 
 var winston = require('winston')
@@ -33,7 +34,7 @@ logger.add(winston.transports.Console, {
     level: 'info'
 });
 
-var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor'];
+var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image'];
 
 var preProcessHelpers = {
     anchor: function(id, title) {
@@ -120,6 +121,9 @@ var markdownHelpers = {
     },
     anchor: function(id, title) {
         return '<div id="'+id+'"></div>';
+    },
+    image: function(imagePath){
+      return '<img src="'+path.join(imagesPath, imagePath)+'" />';
     }
 };
 
@@ -145,6 +149,7 @@ exports.generate = function(options) {
     exampleLiveLinkPath = options.exampleLiveLinkPath;
     apiConfig = options.apiConfig;
     apiNav = options.apiNav || '';
+    imagesPath = options.imagesPath;
 
     if(!fs.existsSync(tempDir)) {
         mkdirp(tempDir);    

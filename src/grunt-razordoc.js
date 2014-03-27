@@ -83,6 +83,7 @@ module.exports = function(grunt) {
     var articleStruct = null;
     var apiConfig = {};
     var apiObjectTree = {};
+    var imagesPath = options.imagesPath;
 
     // api configs
     var apiTree = {
@@ -249,6 +250,7 @@ module.exports = function(grunt) {
         examplesLinkPath: examplesLinkPath,
         exampleImagesLinkPath: exampleImagesLinkPath,
         exampleLiveLinkPath: exampleLiveLinkPath,
+        imagesPath: imagesPath,
         apiNav: apiNav
     });
 
