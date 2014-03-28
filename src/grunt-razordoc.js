@@ -172,24 +172,21 @@ module.exports = function(grunt) {
             
     }
 
-
-    console.log(apiTree.content[0].content[0].content);
-
-
     function navGen(tree) {
         var contents = '';
         if(tree.content) {
+            contents += '<ul>';
             for(var i=0; i<tree.content.length; i++) {
                 var _tree = tree.content[i];
-                contents += '<ul>' + navGen(_tree) + '</ul>';
+                contents += navGen(_tree);
             }
+            contents += '</ul>';
         }
             
         return '<li>' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
     }
 
     var apiNav = navGen(apiTree);
-
 
     // Article configs
     var articleStruct = folderWalker(fs.readdirSync(articlesDir), articlesDir, articles, articlesDir);
