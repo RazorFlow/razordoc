@@ -88,14 +88,14 @@ module.exports = function(grunt) {
     // api configs
     var apiTree = {
         title: 'Razorflow API Documentation',
-        link: '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
+        link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
         content: []
     };
 
     for(var key in options.api.lang) {
         var _apiTree = {
             title: 'Razorflow ' + key.toUpperCase() + ' Documentation',
-            link: '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
+            link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
             content: []
         };
         apiConfig[key] = {
@@ -151,7 +151,7 @@ module.exports = function(grunt) {
             var node = tree.findNodeByClassName(_class);
             var classTree = {
                 title: _class,
-                link: '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath + _class + '.' + outputExt
+                link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath + _class + '.' + outputExt
             };
             _apiTree.content.push(classTree);
         }
