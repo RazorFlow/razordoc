@@ -18,19 +18,46 @@ var viewObjectHelpers = {
     },
     linkify: function(options) {
         return '<a href=' + (options.href || '#') + '>' + options.text + '</a>';
+    },
+    findConstantsObject: function(id) {
+        var obj = exports.constantsObj[id];
+        var resultObj = {};
+        if(obj) {
+             extractProps(obj, resultObj);
+             // console.log('======================================================================');
+             // console.log(resultObj);
+             // console.log('======================================================================');
+             return resultObj;
+        }
+        
+        return null;
     }
 }
 
-exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods, apiNav, articleNav) {
+var extractProps = function(obj, props) {
+    for(var key in obj.properties) {
+        if(obj.properties[key].public) {
+            props[key] = obj.properties[key];    
+        }
+    }
+    if(obj.base !== 'PropertyBase') {
+        extractProps(exports.constantsObj[obj.base], props);
+    }
+    return props;
+};
+
+exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods, apiNav, articleNav, constantsObj, lang) {
     var layoutTemplate = '',
         layoutTemplatePath = _templateDir + '/' + 'layout.ejs';
 
+    exports.constantsObj = constantsObj;
     templateDir = _templateDir; 
 
     var viewOptions = _.extend({
         tree: tree,
         apiNav: apiNav,
-        articleNav: articleNav
+        articleNav: articleNav,
+        lang: lang
     }, viewObjectHelpers);
 
     if(!fs.existsSync(layoutTemplatePath)) {

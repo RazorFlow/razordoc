@@ -84,18 +84,22 @@ module.exports = function(grunt) {
     var apiConfig = {};
     var apiObjectTree = {};
     var imagesPath = options.imagesPath;
+    var constantsPath = options.constantsPath;
+    var constantsFile = fs.readFileSync(path.resolve(configDir, constantsPath), 'utf-8');
+    var constantsObj = JSON.parse(constantsFile);
 
     // api configs
     var apiTree = {
         title: 'Razorflow API Documentation',
-        link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
+        // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
         content: []
     };
 
     for(var key in options.api.lang) {
         var _apiTree = {
             title: 'Razorflow ' + key.toUpperCase() + ' Documentation',
-            link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
+            lang: key,
+            // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
             content: []
         };
         apiConfig[key] = {
@@ -151,7 +155,8 @@ module.exports = function(grunt) {
             var node = tree.findNodeByClassName(_class);
             var classTree = {
                 title: _class,
-                link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath + _class + '.' + outputExt
+                link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath + _class + '.' + outputExt,
+                class: _class
             };
             _apiTree.content.push(classTree);
         }
@@ -174,6 +179,8 @@ module.exports = function(grunt) {
 
     function navGen(tree) {
         var contents = '';
+        var lang = tree.lang || '';
+        var _class = tree['class'];
         if(tree.content) {
             contents += '<ul>';
             for(var i=0; i<tree.content.length; i++) {
@@ -182,8 +189,8 @@ module.exports = function(grunt) {
             }
             contents += '</ul>';
         }
-            
-        return '<li>' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
+        console.log(tree);
+        return '<li data-lang="'+lang+'" data-class="'+_class+'">' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
     }
 
     var apiNav = navGen(apiTree);
@@ -254,7 +261,7 @@ module.exports = function(grunt) {
     articlesGenerator.render();
     for(var key in options.api.lang) {
         var conf = apiObjectTree[key];
-        docgen.generate(conf.tree, conf.templateDir, conf.apiOutput, conf.outputExt, conf.showInheritedMethods, apiNav, articleNav);
+        docgen.generate(conf.tree, conf.templateDir, conf.apiOutput, conf.outputExt, conf.showInheritedMethods, apiNav, articleNav, constantsObj, key);
     }
     
     } catch (e) {
