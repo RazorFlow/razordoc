@@ -194,6 +194,10 @@ function getArticleIndex(path) {
     return _.where(articleTree.articles, {path: path})[0].index;
 }
 
+function getArticleID(path) {
+    return _.where(articleTree.articles, {path: path})[0].id;
+}
+
 function path2Link (_path) {
     _path = _path.replace('.md', '.' + outputFileExt);
     return outputLinkPath + '/' + path.basename(articlesOutput) + '/' +  _path;
@@ -217,7 +221,7 @@ function walkTree(tree, makeUL, makeLI) {
 
             if(typeof index !== undefined) {
                 list = list || [];
-                list[index] = makeLI(linkify(getArticleTitle(item.path), item.path));
+                list[index] = makeLI(linkify(getArticleTitle(item.path), item.path), getArticleID(item.path));
             }
             
             // str += makeLI(linkify(getArticleTitle(item.path), item.path));
@@ -232,10 +236,10 @@ function walkTree(tree, makeUL, makeLI) {
     }
     
     var index = _.where(tree, {name: 'index.md'})[0];
-    return makeLI(linkify(getArticleTitle(index.path), index.path) + makeUL(str));
+    return makeLI(linkify(getArticleTitle(index.path), index.path) + makeUL(str), getArticleID(index.path));
 }
-function makeLI (str) {
-        return '<li>' + str + '</li>';
+function makeLI (str, id) {
+        return '<li data-id="'+id+'">' + str + '</li>';
     }
 
     function makeUL (str) {
@@ -296,12 +300,9 @@ function renderMD (articleTree, tempDir) {
         // console.log(breadcrumb);
         var next = article.next ? {title: article.next.title, path: path2Link(article.next.path)} : null;
         var prev = article.prev ? {title: article.prev.title, path: path2Link(article.prev.path)} : null;
-
         var articleNav = articleTreeGen();
         var file = ejs.render(layout, {articleNav: articleNav, apiNav: apiNav, content: processed, breadcrumb: breadcrumb, title: article.title, 
-                    next: next, prev: prev});
-        // console.log(articleTreeGen());
-        // 
+                    next: next, prev: prev, id: article.id});
         
         fs.writeFileSync(newPath, file, 'utf-8');
     }
