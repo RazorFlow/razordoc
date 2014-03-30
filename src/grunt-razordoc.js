@@ -90,14 +90,14 @@ module.exports = function(grunt) {
 
     // api configs
     var apiTree = {
-        title: 'Razorflow API Documentation',
+        title: 'API Documentation',
         // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
         content: []
     };
 
     for(var key in options.api.lang) {
         var _apiTree = {
-            title: 'Razorflow ' + key.toUpperCase() + ' Documentation',
+            title: key.toUpperCase() + ' Documentation',
             lang: key,
             // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
             content: []
