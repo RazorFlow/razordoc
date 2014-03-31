@@ -34,7 +34,7 @@ logger.add(winston.transports.Console, {
     level: 'info'
 });
 
-var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image'];
+var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice'];
 
 var preProcessHelpers = {
     anchor: function(id, title) {
@@ -124,6 +124,9 @@ var markdownHelpers = {
     },
     image: function(imagePath){
       return '<img src="'+path.join(imagesPath, imagePath)+'" />';
+    },
+    notice: function (type, title, message) {
+        return "<div class='alert alert-" + type + "'><strong>" + title + "</strong> " + message + "</div>";
     }
 };
 
