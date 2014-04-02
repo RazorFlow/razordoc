@@ -189,7 +189,6 @@ module.exports = function(grunt) {
             }
             contents += '</ul>';
         }
-        console.log(tree);
         return '<li data-lang="'+lang+'" data-class="'+_class+'">' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
     }
 
