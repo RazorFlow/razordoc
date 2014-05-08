@@ -18,7 +18,8 @@ exports.parse = function (str, tree) {
     }
     
     var classes = findNodesWhere(doc, {type: 'class'}),
-        methods = findNodesWhere(doc, {type: 'method'});
+        methods = findNodesWhere(doc, {type: 'method'}),
+        boundEvents = findNodesWhere(doc, {type: 'bind'});
 
     var currentClass = null;
     for(var i=0; i<classes.length; i++) {
@@ -29,7 +30,7 @@ exports.parse = function (str, tree) {
         currentClass = classObj;
         tree.classes.push(classObj);
     }
-    
+
     for(var i=0; i<methods.length; i++) {
         var methodObj = {};
         wrappify(methods[i], methodObj);
@@ -46,13 +47,24 @@ exports.parse = function (str, tree) {
         }
         classNode.methods.push(methodObj);
     }
+
+    for(var i=0; i<boundEvents.length; i++) {
+        var boundEventObj = {};
+        wrappify(boundEvents[i], boundEventObj);
+        if(typeof currentClass.boundEvents === 'undefined') {
+            currentClass.boundEvents = [];
+        }
+
+        currentClass.boundEvents.push(boundEventObj);
+    }
+
     return doc;
 }
  
 function wrappify (list, obj) {
     for(var i=0; i<list.length; i++) {
         if(obj[list[i].type]) {
-            if(!_.isArray(obj[list[i].type])) {
+                if(!_.isArray(obj[list[i].type])) {
                 var temp = obj[list[i].type];
                 obj[list[i].type] = [];    
                 obj[list[i].type].push(temp);
@@ -191,6 +203,12 @@ var tagGrammer = {
         tree.push({
             type: 'memberOf',
             name: savedArray[0],
+        });  
+    },
+    '@bind\\s*([a-zA-Z0-9_$]*)': function(tree, matchedString, savedArray) {
+        tree.push({
+            type: 'bind',
+            name: savedArray[0].trim(),
         });  
     },
     '@returns\\s*\\{([a-zA-Z0-9_$|]*)\\}\\s+([\\s\\S]*)': function(tree, matchedString, savedArray) {
