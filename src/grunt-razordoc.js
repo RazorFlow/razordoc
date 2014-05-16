@@ -17,59 +17,6 @@ module.exports = function(grunt) {
 
     });
 
-
-    // var options = {
-    //     articles: {
-    //         root: 'src/content'
-    //     },
-    //     examples: {
-    //         'js': {
-    //             src: "src/examples/js/",
-    //             srcSuffix: ".js",
-    //             imagePrefix: "http://samples.razorflow.com/_assets/images/js/",
-    //             imageSuffix: ".png",
-    //             thumbPrefix: "http://samples.razorflow.com/_assets/images/js/thumbs/",
-    //             thumbSuffix: ".png",
-    //             livePrefix: "http://samples.razorflow.com/js/",
-    //             liveSuffix: ".html"
-    //         },
-    //         'php': {
-    //             src: "src/examples/php/",
-    //             srcSuffix: ".js",
-    //             imagePrefix: "http://samples.razorflow.com/_assets/images/php/",
-    //             imageSuffix: ".png",
-    //             thumbPrefix: "http://samples.razorflow.com/_assets/images/php/thumbs/",
-    //             thumbSuffix: ".png",
-    //             livePrefix: "http://samples.razorflow.com/php/",
-    //             liveSuffix: ".html"
-    //         }
-    //     },
-    //     api: {
-    //         "js": {
-    //             src: ["../jsrf/src/js/components/*.js"],
-    //             out: "build/docs/api/js",
-    //             relativeLinkPath: "api/js/"
-    //         },
-    //         "php": {
-    //             src: ["../phprf/src/lib/components/*.php"],
-    //             out: "build/docs/api/php",
-    //             relativeLinkPath: "api/php/"
-    //         }
-    //     },
-    //     linkPrefix: "",
-    //     out: "build/docs",
-    //     suffix: "html",
-    //     /*
-    //     base.ejs
-    //     article.ejs
-    //     api.ejs
-
-    //     ... all other remaining EJS files
-    //      */
-    //     template: "src/templates/default/article_layout",
-    //     apiTemplates: "src/templates/default"
-    // };
-    // 
     try {
 
     var configDir = process.cwd();
@@ -83,10 +30,14 @@ module.exports = function(grunt) {
     var articleStruct = null;
     var apiConfig = {};
     var apiObjectTree = {};
-    var imagesPath = options.imagesPath;
+    var imagesPath = configDir + '/' + options.articles.imagesPath;
     var constantsPath = options.constantsPath;
     var constantsFile = fs.readFileSync(path.resolve(configDir, constantsPath), 'utf-8');
     var constantsObj = JSON.parse(constantsFile);
+    var imagesRelativePath = linkPrefix + "/" + options.articles.imagesRelativePath;
+    var imagesPhysicalPath = path.resolve(configDir, options.articles.imagesPhysicalPath);
+    var imagesLocalPath = path.resolve(configDir, options.articles.imagesLocalPath);
+
 
     // api configs
     var apiTree = {
@@ -173,7 +124,16 @@ module.exports = function(grunt) {
         // apiObjectTree[key] = tree;
         // apiObjectTree[key]
         // docgen.generate(tree, templateDir, apiOutput, outputExt, showInheritedMethods);
-        console.info("END Generating API Documentation. SUCCESS")
+        console.info("END Generating API Documentation. SUCCESS");
+
+        console.info("START Copying images from ", imagesLocalPath);
+        grunt.file.recurse(imagesLocalPath, function (abspath, rootdir, subdir, filename) {
+            // console.info("Gonna copy to ", imagesPhysicalPath + "/" + subdir + "/" + filename)
+            grunt.file.copy(abspath, imagesPhysicalPath + "/" + subdir + "/" + filename);
+
+        })
+
+        console.info("END Copying images");
             
     }
 
@@ -253,7 +213,7 @@ module.exports = function(grunt) {
         examplesLinkPath: examplesLinkPath,
         exampleImagesLinkPath: exampleImagesLinkPath,
         exampleLiveLinkPath: exampleLiveLinkPath,
-        imagesPath: imagesPath,
+        imagesPath: imagesRelativePath,
         apiNav: apiNav
     });
 
