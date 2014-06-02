@@ -60,7 +60,7 @@ function postProcess (tree) {
             delete classNode.param;
         }
 
-        var methods = classNode.methods;
+        var methods = classNode.methods || [];
 
         for(var j=0; j<methods.length; j++) {
             var methodNode = methods[j];

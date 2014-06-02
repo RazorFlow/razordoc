@@ -224,6 +224,7 @@ module.exports = function(grunt) {
     }
     
     } catch (e) {
+        console.log(e.stack);
         grunt.fail.warn(e);
     }
 
