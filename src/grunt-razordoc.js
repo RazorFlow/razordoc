@@ -107,7 +107,8 @@ module.exports = function(grunt) {
             var classTree = {
                 title: _class,
                 link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath + _class + '.' + outputExt,
-                class: _class
+                class: _class,
+                lang: key
             };
             _apiTree.content.push(classTree);
         }
@@ -149,7 +150,7 @@ module.exports = function(grunt) {
             }
             contents += '</ul>';
         }
-        return '<li data-lang="'+lang+'" data-class="'+_class+'">' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
+        return '<li data-lang="'+lang+'" data-class="'+lang + '_' + _class+'">' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
     }
 
     var apiNav = navGen(apiTree);
