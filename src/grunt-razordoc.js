@@ -37,7 +37,7 @@ module.exports = function(grunt) {
     var imagesRelativePath = linkPrefix + "/" + options.articles.imagesRelativePath;
     var imagesPhysicalPath = path.resolve(configDir, options.articles.imagesPhysicalPath);
     var imagesLocalPath = path.resolve(configDir, options.articles.imagesLocalPath);
-    var riddlerURL = options.riddler.url;
+    var riddlerURL = options.riddler ? options.riddler.url : '';
 
     // api configs
     var apiTree = {

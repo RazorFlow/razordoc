@@ -36,7 +36,7 @@ logger.add(winston.transports.Console, {
     level: 'info'
 });
 
-var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'linkRiddler'];
+var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'riddlerLink'];
 
 var preProcessHelpers = {
     anchor: function(id, title) {
@@ -73,13 +73,28 @@ var markdownHelpers = {
         if(_.indexOf(exampleNode.content, filename) >= 0) {
             var examplePath = path.resolve(exampleNode.src + '/' + filename + exampleNode.srcSuffix);
 
-            var code = fs.readFileSync(examplePath, 'utf-8');
+            var code = fs.readFileSync(examplePath, 'utf-8'),
+                riddlerURLPath = null,
+                riddlerFilename = '';
+
+
+
+            if(lang === 'js') {
+                riddlerURLPath = '';
+                riddlerFilename = filename + '.' + lang;
+                riddlerURLPath = riddlerURL + '?' + querystring.stringify({
+                    source: 'github',
+                    lang: lang,
+                    path: path.join('src', lang, 'examples', riddlerFilename)
+                })
+            }
 
             return ejs.render(content, {
                 code: code,
                 thumbnail: '<img src="' + exampleNode.thumbPrefix + filename + exampleNode.thumbSuffix + '" />',
                 image: exampleNode.imagePrefix + filename + exampleNode.imageSuffix,
-                live: exampleNode.livePrefix + filename + exampleNode.liveSuffix
+                live: exampleNode.livePrefix + filename + exampleNode.liveSuffix,
+                riddlerURL: riddlerURLPath
             });
         } else {
             throw "Example [" + filename + "] not found!";
@@ -130,17 +145,17 @@ var markdownHelpers = {
     notice: function (type, title, message) {
         return "<div class='alert alert-" + type + "'><strong>" + title + "</strong> " + message + "</div>";
     },
-    linkRiddler: function(source, lang, path, title) {
+    riddlerLink: function(source, lang, path, title) {
         var url = '',
             title = title ? title : 'Edit in Riddler';
-            
+
         url = riddlerURL + '?' + querystring.stringify({
             source: source,
             lang: lang,
             path: path
         });
 
-        return "<a href='" + url + "'>" + title + "</a>";
+        return url;
     }
 };
 
