@@ -5,6 +5,7 @@ var path = require('path');
 var _ = require('underscore');
 var marked = require('marked');
 var util = require('util');
+var querystring = require('querystring');
 
 var articleTree,
     apiTree,
@@ -25,7 +26,8 @@ var articleTree,
     exampleLiveLinkPath,
     exampleImagesLinkPath,
     imagesPath,
-    apiNav;
+    apiNav,
+    riddlerURL;
 
 var winston = require('winston')
 var logger = new winston.Logger();
@@ -34,7 +36,7 @@ logger.add(winston.transports.Console, {
     level: 'info'
 });
 
-var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice'];
+var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'linkRiddler'];
 
 var preProcessHelpers = {
     anchor: function(id, title) {
@@ -127,6 +129,18 @@ var markdownHelpers = {
     },
     notice: function (type, title, message) {
         return "<div class='alert alert-" + type + "'><strong>" + title + "</strong> " + message + "</div>";
+    },
+    linkRiddler: function(source, lang, path, title) {
+        var url = '',
+            title = title ? title : 'Edit in Riddler';
+            
+        url = riddlerURL + '?' + querystring.stringify({
+            source: source,
+            lang: lang,
+            path: path
+        });
+
+        return "<a href='" + url + "'>" + title + "</a>";
     }
 };
 
@@ -153,6 +167,7 @@ exports.generate = function(options) {
     apiConfig = options.apiConfig;
     apiNav = options.apiNav || '';
     imagesPath = options.imagesPath;
+    riddlerURL = options.riddlerURL;
 
     if(!fs.existsSync(tempDir)) {
         mkdirp(tempDir);    
