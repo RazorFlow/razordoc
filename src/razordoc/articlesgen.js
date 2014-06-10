@@ -74,27 +74,26 @@ var markdownHelpers = {
             var examplePath = path.resolve(exampleNode.src + '/' + filename + exampleNode.srcSuffix);
 
             var code = fs.readFileSync(examplePath, 'utf-8'),
-                riddlerURLPath = null,
-                riddlerFilename = '';
+                riddlerURLPath = null;
 
 
-
-            if(lang === 'js') {
-                riddlerURLPath = '';
-                riddlerFilename = filename + '.' + lang;
-                riddlerURLPath = riddlerURL + '?' + querystring.stringify({
-                    source: 'github',
-                    lang: lang,
-                    path: path.join('src', lang, 'examples', riddlerFilename)
-                })
-            }
 
             return ejs.render(content, {
                 code: code,
                 thumbnail: '<img src="' + exampleNode.thumbPrefix + filename + exampleNode.thumbSuffix + '" />',
                 image: exampleNode.imagePrefix + filename + exampleNode.imageSuffix,
                 live: exampleNode.livePrefix + filename + exampleNode.liveSuffix,
-                riddlerURL: riddlerURLPath
+                filename: filename + '.' + lang,
+                lang: lang,
+                riddlerURL: function(source, lang, url_path) {
+                    riddlerURLPath = riddlerURL + '?' + querystring.stringify({
+                        source: source,
+                        lang: lang,
+                        path: path.join(url_path)
+                    });
+                    
+                    return riddlerURLPath;
+                }
             });
         } else {
             throw "Example [" + filename + "] not found!";
