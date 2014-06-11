@@ -38,7 +38,7 @@ module.exports = function(grunt) {
     var imagesPhysicalPath = path.resolve(configDir, options.articles.imagesPhysicalPath);
     var imagesLocalPath = path.resolve(configDir, options.articles.imagesLocalPath);
     var riddlerURL = options.riddler ? options.riddler.url : '';
-
+    var partialsPath = options.partialsPath ? path.resolve(configDir, options.partialsPath) : '';
     // api configs
     var apiTree = {
         title: 'API Documentation',
@@ -216,7 +216,8 @@ module.exports = function(grunt) {
         exampleLiveLinkPath: exampleLiveLinkPath,
         imagesPath: imagesRelativePath,
         riddlerURL: riddlerURL,
-        apiNav: apiNav
+        apiNav: apiNav,
+        partialsPath: partialsPath
     });
 
     articlesGenerator.render();

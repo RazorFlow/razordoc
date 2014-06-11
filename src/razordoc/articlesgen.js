@@ -27,7 +27,8 @@ var articleTree,
     exampleImagesLinkPath,
     imagesPath,
     apiNav,
-    riddlerURL;
+    riddlerURL,
+    partialsPath;
 
 var winston = require('winston')
 var logger = new winston.Logger();
@@ -45,20 +46,30 @@ var preProcessHelpers = {
             title: title
         });
     },
+    partial: function(partialPath, obj) {
+        partialPath = path.resolve(partialsPath, partialPath) + '.md';
+        if(fs.existsSync(partialPath)) {
+            var fileContents = partialTags(fs.readFileSync(partialPath, 'utf-8'));
+            var outputMD = ejs.render(fileContents, obj);
+            return outputMD;
+        } else {
+            throw "partial  `" + partialPath +  " does not exist!";
+        }
+    },
     anchors: []
 };
 
 var markdownHelpers = {
     partial: function(filename, obj) {
-        if(_.indexOf(articleTree.partials, filename + '.md') >= 0) {
-            var partialPath = path.resolve(articlesDir + '/_partials/' + filename + '.md');
-            var content = fs.readFileSync(partialPath, 'utf-8');
+        // if(_.indexOf(articleTree.partials, filename + '.md') >= 0) {
+        //     var partialPath = path.resolve(articlesDir + '/_partials/' + filename + '.md');
+        //     var content = fs.readFileSync(partialPath, 'utf-8');
 
-            return ejs.render(content, obj);
-        } else {
-            throw "Partial [" + filename + "] not found!";
-            return '';
-        }
+        //     return ejs.render(content, obj);
+        // } else {
+        //     throw "Partial [" + filename + "] not found!";
+        //     return '';
+        // }
     },
     embedExample: function(lang, filename) {
         var content = '<pre><code><%- code %></code></pre>';
@@ -182,6 +193,7 @@ exports.generate = function(options) {
     apiNav = options.apiNav || '';
     imagesPath = options.imagesPath;
     riddlerURL = options.riddlerURL;
+    partialsPath = options.partialsPath;
 
     if(!fs.existsSync(tempDir)) {
         mkdirp(tempDir);    
@@ -362,7 +374,8 @@ function preprocessMD (articleTree, articlesDir, outputDir, tempDir) {
             meta = readMetaTag(str, article),
             tags = codeTags(meta);
             _anchors = processAnchor(tags),
-            preProcessed = tags,
+            partialsProcessed = processPartial(tags);
+            preProcessed = partialsProcessed,
             dirname = path.dirname(article.path),
             crdr = tempDir + '/' + dirname,
             crPath = path.resolve(tempDir + '/' + article.path);
@@ -412,6 +425,23 @@ function addNavButtons (article) {
 
 function codeTags(str) {
     return str.replace(/\{\{/g, '<%-').replace(/\}\}/g, '%>');
+}
+
+function partialTags(str) {
+    return str.replace(/\{\%/g, '<%').replace(/\%\}/g, '%>');
+}
+
+function ejsTags(str) {
+    return str.replace(/\<\%\-/g, '{{').replace(/\%\>/g, '}}');
+}
+
+function processPartial(file) {
+    var processFile = partialTags(ejsTags(file)),
+        processedFile = ejs.render(processFile, {partial: preProcessHelpers.partial});
+    if(file.indexOf('partial') !== -1) {
+        console.log(file);
+    }
+    return codeTags(processedFile);
 }
 
 function readMetaTag(str, node) {
