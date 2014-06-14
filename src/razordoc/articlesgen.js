@@ -37,7 +37,7 @@ logger.add(winston.transports.Console, {
     level: 'info'
 });
 
-var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'riddlerLink', 'urlForArticle'];
+var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'riddlerLink', 'url'];
 
 var preProcessHelpers = {
     anchor: function(id, title) {
@@ -130,7 +130,7 @@ var markdownHelpers = {
 
         return '<a href="' + url.link + '">' + url.title + '</a>';
     },
-    urlForArticle: function(filename) {
+    url: function(filename) {
         return articleURL(filename).link;
     },
     ref: function(anchor) {
