@@ -345,7 +345,8 @@ function renderMD (articleTree, tempDir) {
         var next = article.next ? {title: article.next.title, path: path2Link(article.next.path)} : null;
         var prev = article.prev ? {title: article.prev.title, path: path2Link(article.prev.path)} : null;
         var articleNav = articleTreeGen();
-        var file = ejs.render(layout, {articleNav: articleNav, apiNav: apiNav, content: processed, breadcrumb: breadcrumb, title: article.title, 
+        var articleTitle = article.hideTitle ? "" : article.title;
+        var file = ejs.render(layout, {articleNav: articleNav, apiNav: apiNav, content: processed, breadcrumb: breadcrumb, title: articleTitle, 
                     next: next, prev: prev, id: article.id});
         
         fs.writeFileSync(newPath, file, 'utf-8');
