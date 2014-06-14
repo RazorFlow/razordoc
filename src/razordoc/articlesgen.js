@@ -37,7 +37,7 @@ logger.add(winston.transports.Console, {
     level: 'info'
 });
 
-var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'riddlerLink'];
+var helperFunctions = ['partial', 'embedExample', 'linkApi', 'linkArticle', 'ref', 'anchor', 'image', 'notice', 'riddlerLink', 'urlForArticle'];
 
 var preProcessHelpers = {
     anchor: function(id, title) {
@@ -122,16 +122,16 @@ var markdownHelpers = {
         }
         
     },
-    linkArticle: function(filename) {
-        var articleNode = _.where(articleTree.articles, {path: filename + '.md'});
-        articleNode = (!articleNode.length) ? _.where(articleTree.articles, {id: filename}) : articleNode;
-        if(!articleNode.length) {
-            return '<a href="#brokenLink" style="background: #F66;">' + filename + '</a>';
-        } else {
-            var articleRoot = outputLinkPath + '/' + path.basename(articlesOutput) + '/' +  articleNode[0].path.replace('.md', '') + '.' + outputFileExt;
-            // var articleRoot = articlesOutput.replace(outputDir, '') + '/' + filename + '.' + outputFileExt;
-            return '<a href="' + articleRoot + '">' + articleNode[0].title + '</a>';
+    linkArticle: function(filename, title) {
+        var url = articleURL(filename, title);
+        if(url.broken) {
+            return '<a href="' + url.link + '" style="background: #F66;">' + filename + '</a>';
         }
+
+        return '<a href="' + url.link + '">' + url.title + '</a>';
+    },
+    urlForArticle: function(filename) {
+        return articleURL(filename).link;
     },
     ref: function(anchor) {
         var anchorNode = _.where(anchors, {id: anchor});
@@ -227,6 +227,19 @@ var rmdir = function(dir) {
         }
     }
     fs.rmdirSync(dir);
+};
+
+var articleURL = function(filename, title) {
+    var articleNode = _.where(articleTree.articles, {path: filename + '.md'});
+    articleNode = (!articleNode.length) ? _.where(articleTree.articles, {id: filename}) : articleNode;
+    if(!articleNode.length) {
+        return { link: '#brokenLink', broken: true, title: '' };
+    } else {
+        var articleTitle = title ? title : articleNode[0].title;
+        var articleRoot = outputLinkPath + '/' + path.basename(articlesOutput) + '/' +  articleNode[0].path.replace('.md', '') + '.' + outputFileExt;
+        return { link: articleRoot, broken: false, title: articleTitle };
+    }
+
 };
 
 
