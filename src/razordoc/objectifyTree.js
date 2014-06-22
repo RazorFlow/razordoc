@@ -61,6 +61,7 @@ function postProcess (tree) {
         }
 
         var methods = classNode.methods || [];
+        var events = classNode.events || [];
 
         for(var j=0; j<methods.length; j++) {
             var methodNode = methods[j];
@@ -74,5 +75,24 @@ function postProcess (tree) {
             }
 
         }
+
+        for(var j=0; j<events.length; j++) {
+          var callbackNode = events[j].callback;
+
+          if(_.isUndefined(callbackNode)) {
+            console.log("\n" + "Seems like there is no callback provided for: " + events[j].name);
+            process.exit();
+          }
+          else {
+            if(!_.isArray(callbackNode.param)) {
+                callbackNode.params = [callbackNode.param];
+                // delete callbackNode.param;
+            } else {
+                callbackNode.params = callbackNode.param;
+                // delete callbackNode.param;
+            }
+          }
+        }
+
     }
 }

@@ -19,7 +19,11 @@ exports.parse = function (str, tree) {
     
     var classes = findNodesWhere(doc, {type: 'class'}),
         methods = findNodesWhere(doc, {type: 'method'}),
-        boundEvents = findNodesWhere(doc, {type: 'bind'});
+        boundEvents = findNodesWhere(doc, {type: 'bind'}),
+        events = findNodesWhere(doc, {type: 'event'});
+        callbacks = findNodesWhere(doc, {type: 'callback'});
+        wrappedCallbacks = {};
+
 
     var currentClass = null;
     for(var i=0; i<classes.length; i++) {
@@ -29,6 +33,12 @@ exports.parse = function (str, tree) {
         if(!classObj.access) classObj.access = {name: 'public'};
         currentClass = classObj;
         tree.classes.push(classObj);
+    }
+
+    for(var i=0; i<callbacks.length; i++) {
+      var callbackObj = {};
+      wrappify(callbacks[i], callbackObj);
+      wrappedCallbacks[callbackObj.callback.name] = callbackObj;
     }
 
     for(var i=0; i<methods.length; i++) {
@@ -46,6 +56,27 @@ exports.parse = function (str, tree) {
             classNode.methods = [];
         }
         classNode.methods.push(methodObj);
+    }
+
+    for(var i=0; i<events.length; i++) {
+      var eventsObj = {};
+      wrappify(events[i], eventsObj);
+      if(typeof currentClass.events === 'undefined') {
+          currentClass.events = [];
+      }
+
+      var eventObj = eventsObj['event'];
+      if(_.isArray(eventObj)) {
+        for(var i=0; i<eventObj.length; i++) {
+          eventObj[i].callback = wrappedCallbacks[eventObj[i].callback];
+          currentClass.events.push(eventObj[i]);
+        }
+      }
+      else {
+        eventObj.callback = wrappedCallbacks[eventObj.callback];
+        currentClass.events.push(eventObj);
+      }
+
     }
 
     for(var i=0; i<boundEvents.length; i++) {
@@ -210,6 +241,19 @@ var tagGrammer = {
             type: 'bind',
             name: savedArray[0].trim(),
         });  
+    },
+    '@event\\s+\{([a-zA-Z0-9_$]+)\}\\s+\{([a-zA-Z0-9_$]+)\}': function(tree, matchedString, savedArray) {
+      tree.push({
+        type: 'event',
+        name: savedArray[0].trim(),
+        callback: savedArray[1].trim()
+      });
+    },
+    '@callback\\s+\{([a-zA-Z0-9_$]+)\}': function(tree, matchedString, savedArray) {
+      tree.push({
+        type: 'callback',
+        name: savedArray[0].trim()
+      });
     },
     '@returns\\s*\\{([a-zA-Z0-9_$|]*)\\}\\s+([\\s\\S]*)': function(tree, matchedString, savedArray) {
         tree.push({

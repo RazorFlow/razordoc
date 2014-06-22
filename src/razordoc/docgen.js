@@ -13,7 +13,6 @@ var viewObjectHelpers = {
 
         var template = fs.readFileSync(templateFilePath, 'utf-8');
         _.extend(obj, viewObjectHelpers);
-        // console.log(obj);
         return ejs.render(template, obj);
     },
     linkify: function(options) {
