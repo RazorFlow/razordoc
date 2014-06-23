@@ -242,11 +242,12 @@ var tagGrammer = {
             name: savedArray[0].trim(),
         });  
     },
-    '@event\\s+\{([a-zA-Z0-9_$]+)\}\\s+\{([a-zA-Z0-9_$]+)\}': function(tree, matchedString, savedArray) {
+    '@event\\s+\{([a-zA-Z0-9_$]+)\}\\s+([a-zA-Z0-9_$\\s\\t]+)\\s+\{([a-zA-Z0-9_$]+)\}': function(tree, matchedString, savedArray) {
       tree.push({
         type: 'event',
         name: savedArray[0].trim(),
-        callback: savedArray[1].trim()
+        desc: savedArray[1].trim(),
+        callback: savedArray[2].trim()
       });
     },
     '@callback\\s+\{([a-zA-Z0-9_$]+)\}': function(tree, matchedString, savedArray) {
