@@ -267,12 +267,14 @@ function linkify(title, _path) {
     return '<a href="'+articleRoot+'">'+title+'</a>';
 }
 
-function walkTree(tree, makeUL, makeLI) {
+function walkTree(tree, makeUL, makeLI, noLI) {
     var str = '';
     var list = null;
     for(var i=0; i<tree.length; i++) {
         var item = tree[i];
-
+        if(item === 'placeholder') {
+            str += '**placeholder**';
+        }
         if(item.type === 'file' && !(path.basename(item.path, '.md') === 'index')) {
             var index = getArticleIndex(item.path);
 
@@ -293,7 +295,12 @@ function walkTree(tree, makeUL, makeLI) {
     }
     
     var index = _.where(tree, {name: 'index.md'})[0];
-    return makeLI(linkify(getArticleTitle(index.path), index.path) + makeUL(str), getArticleID(index.path));
+    if(noLI) {
+        return str;
+    } else {
+        return makeLI(linkify(getArticleTitle(index.path), index.path) + makeUL(str), getArticleID(index.path));    
+    }
+    
 }
 function makeLI (str, id) {
         return '<li data-id="'+id+'">' + str + '</li>';
@@ -305,8 +312,11 @@ function makeLI (str, id) {
 
 function articleTreeGen() {
     var tree = articleTree.articleStruct;
-    return walkTree(tree, makeUL, makeLI);
+    var articleNav = walkTree(tree, makeUL, makeLI, true);
+    return articleNav + apiNav;
 }
+
+exports.articleTreeGen = articleTreeGen;
 
 function articleBreadcrumbGen(fpath) {
     var components = fpath.split('/');

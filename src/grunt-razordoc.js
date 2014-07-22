@@ -48,7 +48,7 @@ module.exports = function(grunt) {
 
     for(var key in options.api.lang) {
         var _apiTree = {
-            title: key.toUpperCase() + ' Documentation',
+            title: 'API Documentation',
             lang: key,
             // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
             content: []
@@ -150,7 +150,7 @@ module.exports = function(grunt) {
             }
             contents += '</ul>';
         }
-        return '<li data-lang="'+lang+'" data-class="'+lang + '_' + _class+'">' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : tree.title) + contents + '</li>';
+        return '<li data-lang="'+lang+'" data-class="'+lang + '_' + _class+'">' + ((!!tree.link) ? '<a href="' + tree.link + '">' + tree.title + '</a>' : '<span>' + tree.title + '</span>') + contents + '</li>';
     }
 
     var apiNav = navGen(apiTree);
@@ -162,7 +162,7 @@ module.exports = function(grunt) {
         articleStruct: articleStruct,
         partials: []
     };
-    var apiTree = {};
+    // var apiTree = {};
     var exampleTree = {};
     
     var examplesDir = '';
@@ -194,7 +194,6 @@ module.exports = function(grunt) {
             content: examples
         }
     }
-
     var articleNav = articlesGenerator.generate({
         namespaces: ['js', 'php'],
         articleTree: articleTree, 
@@ -216,16 +215,19 @@ module.exports = function(grunt) {
         exampleLiveLinkPath: exampleLiveLinkPath,
         imagesPath: imagesRelativePath,
         riddlerURL: riddlerURL,
-        apiNav: apiNav,
+        apiNav: navGen(apiTree.content[0]),
         partialsPath: partialsPath
     });
+
+    console.log(apiTree);
 
     articlesGenerator.render();
     for(var key in options.api.lang) {
         var conf = apiObjectTree[key];
         docgen.generate(conf.tree, conf.templateDir, conf.apiOutput, conf.outputExt, conf.showInheritedMethods, apiNav, articleNav, constantsObj, key);
     }
-    
+    articleNav = articleNav.replace('**placeholder**', apiNav);
+
     } catch (e) {
         console.log(e.stack);
         grunt.fail.warn(e);
