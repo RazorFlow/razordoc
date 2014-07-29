@@ -28,7 +28,8 @@ var articleTree,
     imagesPath,
     apiNav,
     riddlerURL,
-    partialsPath;
+    partialsPath,
+    razorOptions;
 
 var winston = require('winston')
 var logger = new winston.Logger();
@@ -172,6 +173,7 @@ var markdownHelpers = {
 var anchors = [];
 
 exports.generate = function(options) {
+    razorOptions = options.options,
     articleTree = options.articleTree;
     apiTree = options.apiTree;
     exampleTree = options.exampleTree;
@@ -346,7 +348,7 @@ function articleBreadcrumbGen(fpath) {
     
 }
 
-function renderMD (articleTree, tempDir) {
+function renderMD (articleTree, tempDir, options) {
     var articles = articleTree.articles;
     var layout = fs.readFileSync(articleTemplatesDir + '/layout.ejs', 'utf-8');
     // console.log(articleTemplatesDir);
@@ -370,7 +372,7 @@ function renderMD (articleTree, tempDir) {
         var articleNav = articleTreeGen();
         var articleTitle = article.hideTitle ? "" : article.title;
         var file = ejs.render(layout, {articleNav: articleNav, apiNav: apiNav, content: processed, breadcrumb: breadcrumb, title: articleTitle, 
-                    next: next, prev: prev, id: article.id});
+                    next: next, prev: prev, id: article.id, options: razorOptions});
         
         fs.writeFileSync(newPath, file, 'utf-8');
     }

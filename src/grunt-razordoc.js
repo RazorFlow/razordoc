@@ -216,7 +216,8 @@ module.exports = function(grunt) {
         imagesPath: imagesRelativePath,
         riddlerURL: riddlerURL,
         apiNav: navGen(apiTree.content[0]),
-        partialsPath: partialsPath
+        partialsPath: partialsPath,
+        options: options
     });
 
     console.log(apiTree);
