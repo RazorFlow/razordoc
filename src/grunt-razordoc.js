@@ -120,7 +120,8 @@ module.exports = function(grunt) {
             templateDir: templateDir,
             apiOutput: apiOutput,
             outputExt: outputExt,
-            showInheritedMethods: true
+            showInheritedMethods: true,
+            options: options
         }
         // apiObjectTree[key] = tree;
         // apiObjectTree[key]
@@ -225,7 +226,7 @@ module.exports = function(grunt) {
     articlesGenerator.render();
     for(var key in options.api.lang) {
         var conf = apiObjectTree[key];
-        docgen.generate(conf.tree, conf.templateDir, conf.apiOutput, conf.outputExt, conf.showInheritedMethods, apiNav, articleNav, constantsObj, key);
+        docgen.generate(conf.tree, conf.templateDir, conf.apiOutput, conf.outputExt, conf.showInheritedMethods, apiNav, articleNav, constantsObj, key, conf.options);
     }
     articleNav = articleNav.replace('**placeholder**', apiNav);
 

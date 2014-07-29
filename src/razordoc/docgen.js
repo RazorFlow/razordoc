@@ -45,7 +45,7 @@ var extractProps = function(obj, props) {
     return props;
 };
 
-exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods, apiNav, articleNav, constantsObj, lang) {
+exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheritedMethods, apiNav, articleNav, constantsObj, lang, razorOptions) {
     var layoutTemplate = '',
         layoutTemplatePath = _templateDir + '/' + 'layout.ejs';
 
@@ -56,7 +56,8 @@ exports.generate = function(tree, _templateDir, _outputDir, outputExt,showInheri
         tree: tree,
         apiNav: apiNav,
         articleNav: articleNav,
-        lang: lang
+        lang: lang,
+        options: razorOptions
     }, viewObjectHelpers);
 
     if(!fs.existsSync(layoutTemplatePath)) {
