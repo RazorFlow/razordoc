@@ -321,6 +321,9 @@ function articleTreeGen() {
 exports.articleTreeGen = articleTreeGen;
 
 function articleBreadcrumbGen(fpath) {
+    if(fpath.trim() === 'index.md') {
+        return;
+    }
     var components = fpath.split('/');
     var breadcrumb = '';
     var minus = 1;
