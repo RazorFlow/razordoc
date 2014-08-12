@@ -41,14 +41,14 @@ module.exports = function(grunt) {
     var partialsPath = options.partialsPath ? path.resolve(configDir, options.partialsPath) : '';
     // api configs
     var apiTree = {
-        title: 'API Documentation',
+        title: 'API Reference',
         // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.relativeLinkPath,
         content: []
     };
 
     for(var key in options.api.lang) {
         var _apiTree = {
-            title: 'API Documentation',
+            title: 'API Reference',
             lang: key,
             // link: linkPrefix + '/' + path.basename(outputDir) + '/' + options.api.lang[key].relativeLinkPath,
             content: []
